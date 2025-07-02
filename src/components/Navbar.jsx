@@ -3,11 +3,15 @@ import Logo from "../assets/icons/logo.jpg";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 
+const API_URL = "http://localhost:4000/api";
+
 const Navbar = () => {
     const { user, setUser, logout } = useContext(UserContext);
     const [showProfile, setShowProfile] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [editForm, setEditForm] = useState({});
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [msg, setMsg] = useState("");
 
     const handleLogout = () => {
         logout();
@@ -38,19 +42,61 @@ const Navbar = () => {
             const data = await response.json();
 
             if (response.ok && data.user && data.token) {
-                setUser(data.user); // context yangilanadi
-                localStorage.setItem("token", data.token); // yangi token ham saqlanadi
+                setUser(data.user);
+                localStorage.setItem("token", data.token);
                 setEditMode(false);
                 setShowProfile(true);
-                alert("Profil yangilandi!");
+                setMsg("Profil yangilandi!");
             } else {
-                alert("Xatolik: " + (data.msg || "Profil yangilanmadi"));
+                setMsg("Xatolik: " + (data.msg || "Profil yangilanmadi"));
             }
         } catch (err) {
-            alert("Tarmoq xatoligi yoki server ishlamayapti.");
+            setMsg("Tarmoq xatoligi yoki server ishlamayapti.");
         }
     };
 
+    // ===== AVATAR YUKLASH =====
+    const handleAvatarChange = (e) => {
+        setAvatarFile(e.target.files[0]);
+    };
+
+    const handleAvatarUpload = async () => {
+        if (!avatarFile) {
+            setMsg("Rasm tanlanmadi!");
+            return;
+        }
+        const formData = new FormData();
+        formData.append("avatar", avatarFile);
+
+        try {
+            const response = await fetch(`${API_URL}/profile/avatar`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: formData,
+            });
+            const data = await response.json();
+            if (response.ok && data.avatar) {
+                setUser(prev => ({
+                    ...prev,
+                    avatar: data.avatar,
+                }));
+                setMsg("Rasm muvaffaqiyatli yangilandi!");
+                setAvatarFile(null);
+            } else {
+                setMsg("Rasm yuklashda xatolik: " + (data.msg || ""));
+            }
+        } catch (err) {
+            setMsg("Serverda xatolik yuz berdi.");
+        }
+    };
+
+    // Avatar url (profilda va navbar iconida)
+    const getAvatarUrl = (avatar) =>
+        avatar
+            ? `${API_URL}/profile/avatar/${avatar}`
+            : "/default-avatar.png";
 
     return (
         <>
@@ -84,10 +130,20 @@ const Navbar = () => {
                                         onClick={() => setShowProfile(true)}
                                         className="profile__icon"
                                         title="Profil"
+                                        style={{ padding: 0, border: "none", background: "none" }}
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="40" width="40" fill="#770E13" viewBox="0 -960 960 960">
-                                            <path d="M480-480.67q-66 0-109.67-43.66Q326.67-568 326.67-634t43.66-109.67Q414-787.33 480-787.33t109.67 43.66Q633.33-700 633.33-634t-43.66 109.67Q546-480.67 480-480.67ZM160-160v-100q0-36.67 18.5-64.17T226.67-366q65.33-30.33 127.66-45.5 62.34-15.17 125.67-15.17t125.33 15.5q62 15.5 127.28 45.3 30.54 14.42 48.96 41.81Q800-296.67 800-260v100H160Z" />
-                                        </svg>
+                                        {/* Avatar icon */}
+                                        <img
+                                            src={getAvatarUrl(user.avatar)}
+                                            alt="Avatar"
+                                            style={{
+                                                width: 42,
+                                                height: 42,
+                                                borderRadius: "50%",
+                                                objectFit: "cover",
+                                                border: "2px solid #770E13"
+                                            }}
+                                        />
                                     </button>
                                 </div>
                             )}
@@ -99,38 +155,69 @@ const Navbar = () => {
             {/* Profil paneli */}
             {showProfile && user && (
                 <div className="profile-panel">
-                    <button className="close-btn" onClick={() => { setShowProfile(false); setEditMode(false); }}>×</button>
+                    <button className="close-btn" onClick={() => { setShowProfile(false); setEditMode(false); setMsg(""); }}>×</button>
                     <h3>Foydalanuvchi ma’lumotlari</h3>
-                    {!editMode ? (
-                        <>
-                            <p><strong>Ism:</strong> {user.name}</p>
-                            <p><strong>Familiya:</strong> {user.surname}</p>
-                            <p><strong>Email:</strong> {user.email}</p>
-                            <p><strong>Telefon:</strong> {user.phone}</p>
-                            <p><strong>Tug‘ilgan sana:</strong> {user.birthday}</p>
-                            <p><strong>Jinsi:</strong> {user.gender}</p>
-                            <p><strong>Manzil:</strong> {user.address}</p>
-                            <button onClick={handleEditClick} className="logout__btn" style={{ marginTop: 12 }}>Tahrirlash</button>
-                        </>
-                    ) : (
-                        <>
-                            <input className="input" type="text" name="name" value={editForm.name || ""} onChange={handleChange} placeholder="Ism" />
-                            <input className="input" type="text" name="surname" value={editForm.surname || ""} onChange={handleChange} placeholder="Familiya" />
-                            <input className="input" type="email" name="email" value={editForm.email || ""} onChange={handleChange} placeholder="Email" />
-                            <input className="input" type="tel" name="phone" value={editForm.phone || ""} onChange={handleChange} placeholder="Telefon" />
-                            <input className="input" type="date" name="birthday" value={editForm.birthday || ""} onChange={handleChange} placeholder="Tug‘ilgan sana" />
-                            <select className="input" name="gender" value={editForm.gender || ""} onChange={handleChange}>
-                                <option value="">Jinsi</option>
-                                <option value="Erkak">Erkak</option>
-                                <option value="Ayol">Ayol</option>
-                            </select>
-                            <input className="input" type="text" name="address" value={editForm.address || ""} onChange={handleChange} placeholder="Manzil" />
-                            <button onClick={handleSaveEdit} className="logout__btn" style={{ marginTop: 12 }}>Saqlash</button>
-                            <button onClick={() => setEditMode(false)} className="logout__btn" style={{ background: "#999", marginTop: 8 }}>Bekor qilish</button>
-                        </>
-                    )}
-                    <button onClick={handleLogout} className="logout__btn" style={{ marginTop: 18 }}>Chiqish</button>
+
+                    {/* SCROLL QILINADIGAN QISM */}
+                    <div className="profile-content">
+                        <div style={{ textAlign: "center", marginBottom: 20 }}>
+                            <img
+                                src={user.avatar ? `${API_URL}/profile/avatar/${user.avatar}` : "/default-avatar.png"}
+                                alt="Avatar"
+                                width={100}
+                                height={100}
+                                style={{ borderRadius: "50%", objectFit: "cover" }}
+                            />
+                            {editMode && (
+                                <>
+                                    <input type="file" onChange={handleAvatarChange} />
+                                    <button onClick={handleAvatarUpload} style={{ marginTop: 8 }}>Rasmini yuklash</button>
+                                </>
+                            )}
+                        </div>
+                        {msg && <div style={{ color: "#990000", marginBottom: 10 }}>{msg}</div>}
+
+                        {!editMode ? (
+                            <>
+                                <p><strong>Ism:</strong> {user.name}</p>
+                                <p><strong>Familiya:</strong> {user.surname}</p>
+                                <p><strong>Email:</strong> {user.email}</p>
+                                <p><strong>Telefon:</strong> {user.phone}</p>
+                                <p><strong>Tug‘ilgan sana:</strong> {user.birthday}</p>
+                                <p><strong>Jinsi:</strong> {user.gender}</p>
+                                <p><strong>Manzil:</strong> {user.address}</p>
+                            </>
+                        ) : (
+                            <>
+                                <input className="input" type="text" name="name" value={editForm.name || ""} onChange={handleChange} placeholder="Ism" />
+                                <input className="input" type="text" name="surname" value={editForm.surname || ""} onChange={handleChange} placeholder="Familiya" />
+                                <input className="input" type="email" name="email" value={editForm.email || ""} onChange={handleChange} placeholder="Email" />
+                                <input className="input" type="tel" name="phone" value={editForm.phone || ""} onChange={handleChange} placeholder="Telefon" />
+                                <input className="input" type="date" name="birthday" value={editForm.birthday || ""} onChange={handleChange} placeholder="Tug‘ilgan sana" />
+                                <select className="input" name="gender" value={editForm.gender || ""} onChange={handleChange}>
+                                    <option value="">Jinsi</option>
+                                    <option value="Erkak">Erkak</option>
+                                    <option value="Ayol">Ayol</option>
+                                </select>
+                                <input className="input" type="text" name="address" value={editForm.address || ""} onChange={handleChange} placeholder="Manzil" />
+                            </>
+                        )}
+                    </div>
+
+                    {/* HAR DOIM PASTDA CHIQADIGAN TUGMALAR */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        {editMode ? (
+                            <>
+                                <button onClick={handleSaveEdit} className="logout__btn">Saqlash</button>
+                                <button onClick={() => setEditMode(false)} className="logout__btn" style={{ background: "#999" }}>Bekor qilish</button>
+                            </>
+                        ) : (
+                            <button onClick={handleEditClick} className="logout__btn">Tahrirlash</button>
+                        )}
+                        <button onClick={handleLogout} className="logout__btn" style={{ marginTop: 10 }}>Chiqish</button>
+                    </div>
                 </div>
+
             )}
         </>
     );

@@ -1,0 +1,15 @@
+
+
+routes/user.js
+
+middleware/auth.js (agar mavjud bo‘lsa)
+
+src/pages/Profile.jsx
+
+src/components/ChangePassword.jsx (agar bor)
+
+src/context/UserContext.js (agar bor)
+
+src/App.js (agar router/protected route bor)
+
+public/default-avatar.png (faqat rasm link kerak bo‘lsa)

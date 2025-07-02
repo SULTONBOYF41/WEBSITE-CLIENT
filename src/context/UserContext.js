@@ -8,8 +8,13 @@ export function UserProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      setUser(payload); // <-- Foydalanuvchi ma’lumotlarini to‘liq yozamiz!
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setUser(payload);
+      } catch (e) {
+        setUser(null);
+        localStorage.removeItem("token");
+      }
     }
   }, []);
 
