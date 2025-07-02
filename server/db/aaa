@@ -1,15 +1,38 @@
+1. Foydalanuvchi Tajribasi:
+🔹 Email orqali parolni tiklash (Reset password) — "Parolingizni unutdingizmi?" tugmasi.
 
+🔹 Email tasdiqlash (Verification) — yangi userlarga email orqali tasdiqlovchi link jo‘natish.
 
-routes/user.js
+🔹 Responsive va mobil dizayn — mobil qurilmalarda yaxshi ko‘rinish.
 
-middleware/auth.js (agar mavjud bo‘lsa)
+🔹 Yangi xabarlar yoki bildirishnoma (alert yoki toast).
 
-src/pages/Profile.jsx
+2. Foydalanuvchi huquqlari va rollari:
+🔸 Admin panel — adminlar mahsulot yoki userlarni boshqara oladi.
 
-src/components/ChangePassword.jsx (agar bor)
+🔸 Oddiy foydalanuvchi — faqat o‘z profilini ko‘radi/tahrirlaydi.
 
-src/context/UserContext.js (agar bor)
+3. Qo‘shimcha funksiya va modullar:
+🟢 Mahsulotlar (Product) CRUD — admin mahsulot qo‘shadi, tahrirlaydi, o‘chiradi.
 
-src/App.js (agar router/protected route bor)
+🟢 Buyurtmalar tizimi — foydalanuvchi mahsulot buyurtma qiladi, admin buyurtmalarni ko‘radi.
 
-public/default-avatar.png (faqat rasm link kerak bo‘lsa)
+🟢 Foydalanuvchi faolligi tarixi — foydalanuvchi qaysi mahsulotga buyurtma berdi va boshqalar.
+
+🟢 Avatarni tahrirlash, rasm o‘chirish (hozir bor, lekin ko‘proq UI qilish mumkin).
+
+🟢 Hisobot va analitika (chart, statistika).
+
+4. Texnik xizmat va xavfsizlik:
+🔒 Token muddati va refresh (auto-logout)
+
+🔒 Parolni maxfiylikda saqlash
+
+🔒 Xatolik va xakerlikka qarshi backendni mustahkamlash
+
+5. Kod va loyiha sifatini oshirish:
+📁 Kodlarni modullashtirish, folder structure’ni to‘g‘rilash
+
+🧑‍💻 Qisqa, toza, optimallashtirilgan kod
+
+🧹 Unused code, eski fayllarni o‘chirish
