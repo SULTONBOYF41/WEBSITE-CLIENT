@@ -1,0 +1,67 @@
+// Barcha tugmalar uchun umumiy stil
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease-in-out;
+
+  &--primary {
+    text-decoration: none;
+    background-color: $secondary-color;
+    color: $primary-color;
+    border: none;
+    padding: 19px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken($secondary-color, 10%);
+      color: $primary-color;
+      transition: all 0.3s ease-in-out;
+    }
+  }
+
+  &--secondary {
+    text-decoration: none;
+    background-color: $primary-color;
+    color: $white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+
+  &--third {
+    text-decoration: none;
+    background-color: $secondary-color;
+    color: $primary-color;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken($secondary-color, 10%);
+      color: $primary-color;
+      transition: all 0.3s ease-in-out;
+    }
+  }
+
+
+  &--disabled {
+    background-color: grey;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

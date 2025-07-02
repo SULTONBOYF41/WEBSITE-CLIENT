@@ -1,0 +1,13 @@
+.signup-page {
+  max-width: 350px;
+  margin: 50px auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  text-align: center;
+
+  h2{
+    color: $primary-color;
+  }
+}
